@@ -9,3 +9,6 @@ Coin: {title:String
  
  Portfolio: {owner: String
              coins: [Coin]}
+
+# Technologies
+MongoDB, Mongoose, ExpressJS, NodeJs
