@@ -23,4 +23,4 @@ const Portfolio = new Schema(
 	}
 );
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model('Portfolio', Portfolio);
