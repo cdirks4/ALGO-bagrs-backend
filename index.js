@@ -14,8 +14,6 @@ app.use(cors());
 const requestLogger = require('./middleware/request_logger');
 app.use(requestLogger);
 
-const productController = require('./controllers/products');
-app.use('/api/product', productController);
 app.listen(app.get('port'), () => {
 	console.log(`✅ Listening on port ${app.get('port')}`);
 });
