@@ -1,13 +1,10 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(
-	'mongodb+srv://cdirks4:connorpass@cluster0.7ujlv.mongodb.net/algoDB?retryWrites=true&w=majority',
-	{
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	}
-);
+mongoose.connect(process.env.DB_URL, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+});
 const db = mongoose.connection;
 
 db.on('connected', function () {
