@@ -1,26 +1,27 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Coin = new Schema(
+const CoinSchema = new Schema(
 	{
 		title: String,
 		amount: Number,
 		ppc: Number,
-		gain: Number,
 	},
 	{
 		timestamps: true,
 	}
 );
 
-const Portfolio = new Schema(
+const PortfolioSchema = new Schema(
 	{
 		owner: String,
-		coins: [Coin],
+		coins: [CoinSchema],
 	},
 	{
 		timestamps: true,
 	}
 );
 
-module.exports = mongoose.model('Portfolio', Portfolio);
+const Portfolio = mongoose.model('Portfolio', PortfolioSchema);
+const Coin = mongoose.model('Coin', CoinSchema);
+module.exports = { port: Portfolio, coin: Coin };

@@ -1,20 +1,17 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const mongoURI =
-	process.env.NODE_ENV === 'production'
-		? process.env.DB_URL
-		: 'mongodb://localhost/grocery-backend';
-
-mongoose
-	.connect(mongoURI, {
+mongoose.connect(
+	'mongodb+srv://cdirks4:connorpass@cluster0.7ujlv.mongodb.net/algoDB?retryWrites=true&w=majority',
+	{
 		useNewUrlParser: true,
-
 		useUnifiedTopology: true,
-	})
-	.then((instance) =>
-		console.log(`Connected to db: ${instance.connections[0].name}`)
-	)
-	.catch((error) => console.log('Connection failed', error));
+	}
+);
+const db = mongoose.connection;
+
+db.on('connected', function () {
+	console.log(`Connected to ${db.name} at ${db.host}:${db.port}`);
+});
 
 module.exports = mongoose;
