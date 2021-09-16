@@ -4,18 +4,28 @@ const router = express.Router();
 router.post('/', create);
 router.patch('/', update);
 router.get('/:id', show);
+
+const findPricePerCoin = (ppcOne, ppcTwo, sharesOne, sharesTwo) => {
+	let totalOne = ppcOne * sharesOne;
+	let totalTwo = ppcTwo * sharesTwo;
+	let total = totalOne + totalTwo;
+	let shares = sharesOne + sharesTwo;
+	return total / shares;
+};
+
 async function create(req, res, next) {
 	try {
-		portfolio = await Portfolio.findOne({ owner: req.body.owner });
+		let portfolio = await Portfolio.findOne({ owner: req.body.owner });
 		if (portfolio) {
 			update(req, res);
 		} else {
-			portfolio = await Portfolio.create({ owner: req.body.owner });
+			let portfolio = await Portfolio.create({ owner: req.body.owner });
 
 			portfolio.coins.push({
 				title: req.body.title,
-				amount: req.body.amount,
+				ppc: req.body.ppc,
 				shares: req.body.shares,
+				geckoId: req.body.geckoId,
 			});
 			portfolio.save();
 			res.json(portfolio);
@@ -35,10 +45,14 @@ async function update(req, res, next) {
 		if (portfolio[0]) {
 			portfolio[0].coins.forEach((coin) => {
 				if (coin.title === req.body.title) {
-					coin.amount = parseInt(coin.amount);
-					coin.shares = parseInt(coin.shares);
-					coin.amount += parseInt(req.body.amount);
-					coin.shares += parseInt(req.body.shares);
+					let ppc = findPricePerCoin(
+						parseInt(req.body.ppc),
+						parseInt(coin.ppc),
+						parseInt(req.body.shares),
+						parseInt(coin.shares)
+					);
+					coin.shares += req.body.shares;
+					coin.ppc = ppc;
 				}
 			});
 		} else {
@@ -47,14 +61,14 @@ async function update(req, res, next) {
 			});
 			portfolio[0].coins.push({
 				title: req.body.title,
-				amount: req.body.amount,
+				ppc: req.body.ppc,
 				shares: req.body.shares,
+				geckoId: req.body.geckoId,
 			});
 		}
 		portfolio[0].save();
 		res.json(portfolio);
 	} catch (err) {
-		console.log(err);
 		res.json(err);
 	}
 }
@@ -62,8 +76,7 @@ async function update(req, res, next) {
 async function show(req, res, next) {
 	try {
 		let portfolio = await Portfolio.findOne({ owner: req.params.id });
-		console.log('hi');
-		console.log(portfolio);
+
 		res.json(portfolio);
 	} catch (err) {
 		res.json(err);

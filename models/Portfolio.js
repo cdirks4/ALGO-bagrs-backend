@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 const CoinSchema = new Schema(
 	{
 		title: String,
-		amount: Number,
+		ppc: Number,
 		shares: Number,
-		purchaseDate: [Date],
+		geckoId: String,
 	},
 	{
 		timestamps: true,
