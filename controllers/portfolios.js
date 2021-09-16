@@ -1,8 +1,9 @@
 const express = require('express');
 const Portfolio = require('../models/Portfolio');
 const router = express.Router();
-router.post('/:id', create);
+router.post('/', create);
 router.patch('/', update);
+router.get('/:id', show);
 async function create(req, res, next) {
 	try {
 		portfolio = await Portfolio.findOne({ owner: req.body.owner });
@@ -57,4 +58,16 @@ async function update(req, res, next) {
 		res.json(err);
 	}
 }
+
+async function show(req, res, next) {
+	try {
+		let portfolio = await Portfolio.findOne({ owner: req.params.id });
+		console.log('hi');
+		console.log(portfolio);
+		res.json(portfolio);
+	} catch (err) {
+		res.json(err);
+	}
+}
+
 module.exports = router;
