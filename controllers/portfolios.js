@@ -1,47 +1,60 @@
-Schemas = require('../models/Portfolio');
-console.log(Schemas);
 const express = require('express');
+const Portfolio = require('../models/Portfolio');
 const router = express.Router();
-// module.exports = {
-// 	show,
-// 	create,
-// 	update,
-// };
-router.post('/', async (req, res, next) => {
+router.post('/:id', create);
+router.patch('/', update);
+async function create(req, res, next) {
 	try {
-		console.log(req.body);
-		portfolio = await Schemas.port.create({ owner: req.body.owner });
-		coin = await Schemas.coin.create(req.body.coin);
+		portfolio = await Portfolio.findOne({ owner: req.body.owner });
+		if (portfolio) {
+			update(req, res);
+		} else {
+			portfolio = await Portfolio.create({ owner: req.body.owner });
 
-		portfolio.coins.push(coin);
-		portfolio.save();
+			portfolio.coins.push({
+				title: req.body.title,
+				amount: req.body.amount,
+				shares: req.body.shares,
+			});
+			portfolio.save();
+			res.json(portfolio);
+		}
+	} catch (err) {
+		console.log(err);
+		res.json(err);
+	}
+}
+async function update(req, res, next) {
+	try {
+		let portfolio = await Portfolio.find({
+			owner: req.body.owner,
+			'coins.title': req.body.title,
+		});
+		console.log(portfolio[0]);
+		if (portfolio[0]) {
+			portfolio[0].coins.forEach((coin) => {
+				if (coin.title === req.body.title) {
+					coin.amount = parseInt(coin.amount);
+					coin.shares = parseInt(coin.shares);
+					coin.amount += parseInt(req.body.amount);
+					coin.shares += parseInt(req.body.shares);
+				}
+			});
+		} else {
+			portfolio = await Portfolio.find({
+				owner: req.body.owner,
+			});
+			portfolio[0].coins.push({
+				title: req.body.title,
+				amount: req.body.amount,
+				shares: req.body.shares,
+			});
+		}
+		portfolio[0].save();
 		res.json(portfolio);
 	} catch (err) {
 		console.log(err);
 		res.json(err);
 	}
-});
-async function show(req, res) {
-	try {
-		const portfolio = await Portfolio.find({});
-		res.json(portfolio);
-	} catch (err) {
-		res.json(err);
-	}
 }
-async function create(req, res) {
-	try {
-		console.log(req.body);
-		portfolio = await Portfolio.create({ owner: 'owner' });
-		console.log(portfolio);
-		// coin = await Coin.create(req.body.coin);
-		// console.log(coin);
-		// portfolio.coins.push(coin);
-		portfolio.save();
-		res.json(portfolio);
-	} catch (err) {
-		res.json(err);
-	}
-}
-
 module.exports = router;

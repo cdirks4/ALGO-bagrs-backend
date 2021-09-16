@@ -5,7 +5,8 @@ const CoinSchema = new Schema(
 	{
 		title: String,
 		amount: Number,
-		ppc: Number,
+		shares: Number,
+		purchaseDate: [Date],
 	},
 	{
 		timestamps: true,
@@ -23,5 +24,5 @@ const PortfolioSchema = new Schema(
 );
 
 const Portfolio = mongoose.model('Portfolio', PortfolioSchema);
-const Coin = mongoose.model('Coin', CoinSchema);
-module.exports = { port: Portfolio, coin: Coin };
+// const Coin = mongoose.model('Coin', CoinSchema);
+module.exports = Portfolio;
