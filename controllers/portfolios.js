@@ -16,12 +16,11 @@ const findPricePerCoin = (ppcOne, ppcTwo, sharesOne, sharesTwo) => {
 async function create(req, res, next) {
 	try {
 		let portfolio = await Portfolio.findOne({ owner: req.body.owner });
+
 		if (portfolio) {
 			update(req, res);
 		} else {
 			let portfolio = await Portfolio.create({ owner: req.body.owner });
-			console.log(req.body.owner);
-
 			portfolio.coins.push({
 				title: req.body.title,
 				ppc: req.body.ppc,
@@ -29,7 +28,6 @@ async function create(req, res, next) {
 				geckoId: req.body.geckoId,
 			});
 			await portfolio.save();
-			console.log(portfolio);
 			res.json(portfolio);
 		}
 	} catch (err) {
@@ -40,23 +38,25 @@ async function create(req, res, next) {
 async function update(req, res, next) {
 	try {
 		let portfolio = await Portfolio.find({
-			owner: req.body.owner,
 			'coins.title': req.body.title,
+			owner: req.body.owner,
 		});
 		if (portfolio[0]) {
+			console.log(req.body);
 			portfolio[0].coins.forEach((coin) => {
 				if (coin.title === req.body.title) {
 					let ppc = findPricePerCoin(
-						parseInt(req.body.ppc),
-						parseInt(coin.ppc),
-						parseInt(req.body.shares),
-						parseInt(coin.shares)
+						req.body.ppc,
+						coin.ppc,
+						req.body.shares,
+						coin.shares
 					);
 					coin.shares += req.body.shares;
 					coin.ppc = ppc;
 				}
 			});
 		} else {
+			console.log('broke');
 			portfolio = await Portfolio.find({
 				owner: req.body.owner,
 			});
@@ -67,7 +67,10 @@ async function update(req, res, next) {
 				geckoId: req.body.geckoId,
 			});
 		}
-		portfolio[0].save();
+		console.log(portfolio[0]);
+		// console.log(portfolio[0].coins);
+
+		await portfolio[0].save();
 		res.json(portfolio);
 	} catch (err) {
 		res.json(err);
@@ -77,7 +80,9 @@ async function update(req, res, next) {
 async function show(req, res, next) {
 	try {
 		let portfolio = await Portfolio.findOne({ owner: req.params.id });
-		console.log(req.params.id);
+		if (portfolio == null) {
+			portfolio = portfolio[0];
+		}
 		console.log(portfolio);
 		res.json(portfolio);
 	} catch (err) {
@@ -88,6 +93,9 @@ async function show(req, res, next) {
 async function updateSell(req, res, next) {
 	try {
 		let portfolio = await Portfolio.findOne({ owner: req.params.id });
+		if (portfolio == null) {
+			portfolio = portfolio[0];
+		}
 		let coin = portfolio.coins.id(req.body.coin_id);
 		console.log(coin);
 		coin.shares -= req.body.shares;
