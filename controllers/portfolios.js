@@ -2,9 +2,9 @@ const express = require('express');
 const Portfolio = require('../models/Portfolio');
 const router = express.Router();
 router.post('/', create);
-router.patch('/', update);
+router.put('/', update);
 router.get('/:id', show);
-
+router.patch('/:id', updateSell);
 const findPricePerCoin = (ppcOne, ppcTwo, sharesOne, sharesTwo) => {
 	let totalOne = ppcOne * sharesOne;
 	let totalTwo = ppcTwo * sharesTwo;
@@ -41,7 +41,6 @@ async function update(req, res, next) {
 			owner: req.body.owner,
 			'coins.title': req.body.title,
 		});
-		console.log(portfolio[0]);
 		if (portfolio[0]) {
 			portfolio[0].coins.forEach((coin) => {
 				if (coin.title === req.body.title) {
@@ -78,6 +77,18 @@ async function show(req, res, next) {
 		let portfolio = await Portfolio.findOne({ owner: req.params.id });
 
 		res.json(portfolio);
+	} catch (err) {
+		res.json(err);
+	}
+}
+
+async function updateSell(req, res, next) {
+	try {
+		let portfolio = await Portfolio.findOne({ owner: req.params.id });
+		let coin = portfolio.coins.id(req.body.coin_id);
+		console.log(coin);
+		coin.shares -= req.body.shares;
+		portfolio.save();
 	} catch (err) {
 		res.json(err);
 	}
