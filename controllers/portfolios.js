@@ -20,6 +20,7 @@ async function create(req, res, next) {
 			update(req, res);
 		} else {
 			let portfolio = await Portfolio.create({ owner: req.body.owner });
+			console.log(req.body.owner);
 
 			portfolio.coins.push({
 				title: req.body.title,
@@ -27,7 +28,8 @@ async function create(req, res, next) {
 				shares: req.body.shares,
 				geckoId: req.body.geckoId,
 			});
-			portfolio.save();
+			await portfolio.save();
+			console.log(portfolio);
 			res.json(portfolio);
 		}
 	} catch (err) {
@@ -75,7 +77,8 @@ async function update(req, res, next) {
 async function show(req, res, next) {
 	try {
 		let portfolio = await Portfolio.findOne({ owner: req.params.id });
-
+		console.log(req.params.id);
+		console.log(portfolio);
 		res.json(portfolio);
 	} catch (err) {
 		res.json(err);
