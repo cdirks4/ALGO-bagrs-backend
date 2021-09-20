@@ -1,4 +1,5 @@
 const express = require('express');
+const { db } = require('../models/Portfolio');
 const Portfolio = require('../models/Portfolio');
 const router = express.Router();
 router.post('/', create);
@@ -72,7 +73,6 @@ async function update(req, res, next) {
 			});
 		}
 		console.log(portfolio[0]);
-		// console.log(portfolio[0].coins);
 
 		await portfolio[0].save();
 		res.json(portfolio);
@@ -96,14 +96,31 @@ async function show(req, res, next) {
 
 async function updateSell(req, res, next) {
 	try {
-		let portfolio = await Portfolio.findOne({ owner: req.params.id });
-		if (portfolio == null) {
-			portfolio = portfolio[0];
+		let portfolio = await Portfolio.findOne({
+			owner: req.params.id,
+			'coins.title': req.body.title,
+		});
+		let coin = await portfolio.coins.filter((coin) => {
+			if (coin.title === req.body.title) return coin;
+		});
+
+		coin[0].shares -= req.body.shares;
+		console.log(coin[0]);
+		if (coin[0].shares < 0) {
+			console.log('hi');
+			portfolio = await Portfolio.findOneAndUpdate(
+				{ owner: req.params.id },
+				{ $pull: { coins: { title: req.body.title } } },
+				{ new: true },
+				function (err) {
+					if (err) {
+						console.log(err);
+					}
+				}
+			);
 		}
-		let coin = portfolio.coins.id(req.body.coin_id);
-		console.log(coin);
-		coin.shares -= req.body.shares;
 		portfolio.save();
+		res.json(portfolio);
 	} catch (err) {
 		res.json(err);
 	}
