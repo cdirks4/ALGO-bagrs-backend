@@ -3,6 +3,8 @@ const Schema = mongoose.Schema;
 
 const CoinSchema = new Schema(
 	{
+		image: String,
+		symbol: String,
 		title: String,
 		ppc: Number,
 		shares: Number,

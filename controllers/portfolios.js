@@ -26,6 +26,8 @@ async function create(req, res, next) {
 				ppc: req.body.ppc,
 				shares: req.body.shares,
 				geckoId: req.body.geckoId,
+				image: req.body.image,
+				symbol: req.body.symbol,
 			});
 			await portfolio.save();
 			res.json(portfolio);
@@ -65,6 +67,8 @@ async function update(req, res, next) {
 				ppc: req.body.ppc,
 				shares: req.body.shares,
 				geckoId: req.body.geckoId,
+				image: req.body.image,
+				symbol: req.body.symbol,
 			});
 		}
 		console.log(portfolio[0]);
